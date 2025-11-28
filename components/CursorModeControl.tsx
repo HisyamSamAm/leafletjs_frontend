@@ -11,24 +11,30 @@ interface CursorModeControlProps {
 
 const CursorModeControl = ({ mode, setMode }: CursorModeControlProps) => {
     return (
-        <div className="absolute top-4 right-4 z-[5000] flex flex-col gap-2 bg-white/90 backdrop-blur-sm p-2 rounded-lg shadow-xl border">
+        <div className="absolute top-4 right-4 z-[5000] flex flex-col gap-4">
             <Button
-                variant={mode === "navigate" ? "default" : "ghost"}
+                variant={mode === "navigate" ? "default" : "secondary"}
                 size="icon"
                 onClick={() => setMode("navigate")}
                 title="Navigate Mode (Pan/Zoom)"
-                className={cn("h-10 w-10", mode === "navigate" && "bg-blue-600 hover:bg-blue-700")}
+                className={cn(
+                    "h-12 w-12 rounded-full shadow-xl",
+                    mode === "navigate" ? "bg-primary hover:bg-primary/90" : "bg-white hover:bg-gray-100 text-foreground"
+                )}
             >
-                <MousePointer2 className="h-5 w-5" />
+                <MousePointer2 className="h-6 w-6" />
             </Button>
             <Button
-                variant={mode === "add" ? "default" : "ghost"}
+                variant={mode === "add" ? "default" : "secondary"}
                 size="icon"
                 onClick={() => setMode("add")}
                 title="Add Place Mode (Click map to add)"
-                className={cn("h-10 w-10", mode === "add" && "bg-blue-600 hover:bg-blue-700")}
+                className={cn(
+                    "h-12 w-12 rounded-full shadow-xl",
+                    mode === "add" ? "bg-primary hover:bg-primary/90" : "bg-white hover:bg-gray-100 text-foreground"
+                )}
             >
-                <MapPin className="h-5 w-5" />
+                <MapPin className="h-6 w-6" />
             </Button>
         </div>
     );
