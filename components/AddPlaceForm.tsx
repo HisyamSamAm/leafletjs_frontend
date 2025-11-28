@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Plus, X } from "lucide-react";
+import { X } from "lucide-react";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import { mutate } from "swr";
@@ -27,10 +27,23 @@ interface FormData {
     lng: number;
 }
 
-const AddPlaceForm = () => {
-    const [isOpen, setIsOpen] = useState(false);
+interface AddPlaceFormProps {
+    isOpen: boolean;
+    onClose: () => void;
+    lat: number | null;
+    lng: number | null;
+}
+
+const AddPlaceForm = ({ isOpen, onClose, lat, lng }: AddPlaceFormProps) => {
     const [loading, setLoading] = useState(false);
     const { register, handleSubmit, reset, setValue } = useForm<FormData>();
+
+    useEffect(() => {
+        if (lat && lng) {
+            setValue("lat", lat);
+            setValue("lng", lng);
+        }
+    }, [lat, lng, setValue]);
 
     const onSubmit = async (data: FormData) => {
         setLoading(true);
@@ -46,7 +59,7 @@ const AddPlaceForm = () => {
             });
             reset();
             mutate(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/places`); // Refresh map data
-            setIsOpen(false);
+            onClose();
             toast.success("Place added successfully!");
         } catch (error) {
             console.error(error);
@@ -56,22 +69,13 @@ const AddPlaceForm = () => {
         }
     };
 
-    if (!isOpen) {
-        return (
-            <Button
-                className="absolute top-4 right-4 z-[5000] rounded-full w-12 h-12 shadow-xl flex items-center justify-center"
-                onClick={() => setIsOpen(true)}
-            >
-                <Plus className="h-6 w-6" />
-            </Button>
-        );
-    }
+    if (!isOpen) return null;
 
     return (
         <Card className="w-full max-w-md absolute top-4 right-4 z-[5000] shadow-xl bg-white/90 backdrop-blur-sm">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle>Add New Place</CardTitle>
-                <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}>
+                <Button variant="ghost" size="icon" onClick={onClose}>
                     <X className="h-4 w-4" />
                 </Button>
             </CardHeader>

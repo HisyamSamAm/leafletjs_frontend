@@ -1,6 +1,6 @@
 "use client";
 
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
 import "leaflet-defaulticon-compatibility";
@@ -8,14 +8,28 @@ import { FeatureCollection, PlaceFeature } from "@/types";
 import { Button } from "@/components/ui/button";
 import { memo } from "react";
 import PlaceListControl from "./PlaceListControl";
+import { LatLng } from "leaflet";
 
 interface MapViewProps {
     data: FeatureCollection | undefined;
     onEdit: (place: PlaceFeature) => void;
     onDelete: (place: PlaceFeature) => void;
+    mode: "navigate" | "add";
+    onMapClick: (latlng: LatLng) => void;
 }
 
-const MapView = memo(({ data, onEdit, onDelete }: MapViewProps) => {
+const MapClickHandler = ({ mode, onMapClick }: { mode: "navigate" | "add"; onMapClick: (latlng: LatLng) => void }) => {
+    useMapEvents({
+        click(e) {
+            if (mode === "add") {
+                onMapClick(e.latlng);
+            }
+        },
+    });
+    return null;
+};
+
+const MapView = memo(({ data, onEdit, onDelete, mode, onMapClick }: MapViewProps) => {
     return (
         <MapContainer
             center={[-6.917, 107.619]} // Bandung coordinates
@@ -23,6 +37,7 @@ const MapView = memo(({ data, onEdit, onDelete }: MapViewProps) => {
             scrollWheelZoom={true}
             style={{ height: "100%", width: "100%" }}
         >
+            <MapClickHandler mode={mode} onMapClick={onMapClick} />
             <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
